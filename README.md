@@ -55,6 +55,31 @@ General Usage
 using plain javascript. It is recommended that you first run this one and check
 the XCode console to see that everything is working fine.
 
+### Note from @Deadknight:
+The `index.html` example will not work from now, in my release this plugin functions are similar to 
+PhoneGap Storage functions. You can use this library without changing your database javascript code so much.
+Only difference is, you need to load this plugin normally, not as window.openDatabase.
+Also you have to change is adding success and failure callbacks to executeSql statements like this
+db.executeSql('DROP TABLE IF EXISTS test_table', successCB, errorCB)
+For more information look at http://docs.phonegap.com/en/2.3.0/cordova_storage_storage.md.html#Storage
+There is an example here.
+
+## Database Creation example
+    if((DEVICE === "iPad" || DEVICE === "iPhone") && VERSIONMAX <= 4)
+    {
+        var dbShell = new PGSQLitePlugin("testname", function()
+        {
+            dbShell.transaction(populateFunc);
+        }, errorCB);
+    }
+    else
+    {
+        var dbShell = window.openDatabase("testname", "1.0", "test desc", 4194304);
+        dbShell.transaction(populateFunc, errorCB, successCB);
+    }
+
+<del>For example
+
 The following examples show you how you can use transactions.
 
 ## Coffee Script
@@ -101,7 +126,10 @@ The following examples show you how you can use transactions.
         return console.log("ERROR: " + e.message);
       });
     });
+</del>
 
+### Note from @Deadknight:
+I'm not sure below from this point will work.
 
 Lawnchair Adapter Usage
 =======================
