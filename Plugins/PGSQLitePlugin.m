@@ -9,6 +9,11 @@
  * See http://opensource.org/licenses/alphabetical for full text.
  */
 
+/*
+ * 2013 revision update for phonegap by Deadknight
+ * https://github.com/Deadknight/Phonegap-SQLitePlugin
+ */
+
 
 #import "PGSQLitePlugin.h"
 
@@ -218,7 +223,17 @@
         if (hasInsertId) {
             [resultSet setObject:insertId forKey:@"insertId"];
         }
-        [self respond:callback withString:[resultSet JSONString] withType:@"success"];
+        [self respond:callback withString:[@"undefined," stringByAppendingString:[resultSet cdvjk_JSONString]] withType:@"success"];
+        /*
+         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+         [dict setObject:@"function(i) { return data[i]; }" forKey:@"item"];
+         [dict setObject:resultRows forKey:@"data"];
+         [resultSet setObject:dict forKey:@"rows"];
+         [resultSet setObject:rowsAffected forKey:@"rowsAffected"];
+         if (hasInsertId) {
+         [resultSet setObject:insertId forKey:@"insertId"];
+         }
+         [self respond:callback withString:[resultSet cdvjk_JSONString] withType:@"success"];*/
     }
 }
 

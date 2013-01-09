@@ -9,12 +9,18 @@
  * See http://opensource.org/licenses/alphabetical for full text.
  */
 
+/*
+ * 2013 revision update for phonegap by Deadknight
+ * https://github.com/Deadknight/Phonegap-SQLitePlugin
+ */
+
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
 
+#define CORDOVA_FRAMEWORK
 #ifdef CORDOVA_FRAMEWORK
 #import <Cordova/CDVPlugin.h>
-#import <CORDOVA/JSONKit.h>
+#import <Cordova/JSONKit.h>
 #import <Cordova/CDVURLProtocol.h>
 #else
 #import "CDVPlugin.h"

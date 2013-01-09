@@ -1,5 +1,5 @@
 (function() {
-  var callbacks, cbref, counter, getOptions, root;
+  var callbacks, cbref, counter, getOptions, root, background;
 
   root = this;
 
@@ -34,10 +34,13 @@
 
     PGSQLitePlugin.prototype.openDBs = {};
 
-    function PGSQLitePlugin(dbPath, openSuccess, openError) {
+    function PGSQLitePlugin(dbPath, openSuccess, openError, background) {
       this.dbPath = dbPath;
       this.openSuccess = openSuccess;
       this.openError = openError;
+      if(background === undefined)
+         background = false;
+      this.background = background;
       if (!dbPath) {
         throw new Error("Cannot create a PGSQLitePlugin instance without a dbPath");
       }
@@ -50,23 +53,44 @@
       this.open(this.openSuccess, this.openError);
     }
 
-    PGSQLitePlugin.handleCallback = function(ref, type, obj) {
+    PGSQLitePlugin.handleCallback = function(ref, type)
+    {
+      var argumentsArr = [];
+      for(var i = 2; i < arguments.length; i++)
+      {
+         argumentsArr.push(arguments[i]);
+      }
+      
       var _ref;
       if ((_ref = callbacks[ref]) != null) {
-        if (typeof _ref[type] === "function") _ref[type](obj);
+        if (typeof _ref[type] === "function") _ref[type].apply(this, argumentsArr);
       }
       callbacks[ref] = null;
       delete callbacks[ref];
     };
 
-    PGSQLitePlugin.prototype.executeSql = function(sql, success, error) {
+    PGSQLitePlugin.prototype.executeSql = function(sql) {
+      var success, error;
+      if(arguments.length == 4)
+      {
+          success = arguments[2];
+          error = arguments[3];
+      }
+      else
+      {
+          success = arguments[1];
+          error = arguments[2];
+      }
       var opts;
       if (!sql) throw new Error("Cannot executeSql without a query");
       opts = getOptions({
         query: [].concat(sql || []),
         path: this.dbPath
       }, success, error);
+    if(background)
       Cordova.exec("PGSQLitePlugin.backgroundExecuteSql", opts);
+    else
+      Cordova.exec("PGSQLitePlugin.executeSql", opts);
     };
 
     PGSQLitePlugin.prototype.transaction = function(fn, success, error) {
@@ -109,7 +133,18 @@
       this.executes = [];
     }
 
-    PGSQLitePluginTransaction.prototype.executeSql = function(sql, success, error) {
+    PGSQLitePluginTransaction.prototype.executeSql = function(sql){
+      var success, error;
+      if(arguments.length == 4)
+      {
+          success = arguments[2];
+          error = arguments[3];
+      }
+      else
+      {
+          success = arguments[1];
+          error = arguments[2];
+      }
       this.executes.push(getOptions({
         query: [].concat(sql || []),
         path: this.dbPath
@@ -132,7 +167,10 @@
       opts = {
         executes: executes
       };
+    if(background)
       Cordova.exec("PGSQLitePlugin.backgroundExecuteSqlBatch", opts);
+    else
+      Cordova.exec("PGSQlitePlugin.executeSqlBatch", opts);
       this.executes = [];
     };
 
